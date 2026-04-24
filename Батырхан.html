@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python — 11-сынып курсы</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#2d6a4f;--green-light:#52b788;--green-bg:#d8f3dc;--green-mid:#95d5b2;
+  --blue:#1d3557;--blue-light:#457b9d;--blue-bg:#e8f4fd;
+  --amber:#b5451b;--amber-bg:#fff3e0;--amber-light:#f4a261;
+  --red:#9b2226;--red-bg:#ffe8e8;
+  --gray-900:#1a1a2e;--gray-700:#374151;--gray-500:#6b7280;--gray-300:#d1d5db;--gray-100:#f3f4f6;--gray-50:#f9fafb;
+  --white:#ffffff;
+  --sidebar-w:260px;
+  --radius:10px;
+}
+body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-700);display:flex;height:100vh;overflow:hidden}
+code,pre,.code-block,textarea.editor{font-family:'JetBrains Mono',monospace}
+ 
+/* Sidebar */
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--gray-900);color:#e5e7eb;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden}
+.sidebar-logo{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;border-radius:8px;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.logo-text{font-size:13px;font-weight:700;color:#fff;line-height:1.2}
+.logo-sub{font-size:11px;color:#9ca3af;font-weight:400}
+.sidebar-student{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.07);font-size:12px;color:#9ca3af}
+.sidebar-student span{color:#e5e7eb;font-weight:600}
+.global-prog{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.g-bar-bg{height:3px;background:rgba(255,255,255,0.1);border-radius:3px}
+.g-bar-fill{height:3px;border-radius:3px;background:var(--green-light);transition:width .5s}
+.g-label{font-size:10px;color:#6b7280;margin-top:4px}
+.nav-group{padding:8px 0}
+.nav-group-title{font-size:9px;font-weight:700;letter-spacing:.1em;color:#6b7280;padding:4px 16px 2px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 16px;cursor:pointer;font-size:12px;color:#9ca3af;border-left:2px solid transparent;transition:all .15s;line-height:1.3}
+.nav-item:hover{background:rgba(255,255,255,0.05);color:#e5e7eb}
+.nav-item.active{background:rgba(82,183,136,0.12);color:#fff;border-left-color:var(--green-light);font-weight:600}
+.nav-item.done .n-dot{background:var(--green-light)}
+.nav-item.locked{opacity:.35;cursor:not-allowed;pointer-events:none}
+.n-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.15);flex-shrink:0}
+.n-tag{font-size:9px;margin-left:auto;padding:1px 6px;border-radius:10px;flex-shrink:0}
+.n-tag.th{background:rgba(69,123,157,.25);color:#93c5fd}
+.n-tag.pr{background:rgba(244,162,97,.2);color:#fcd34d}
+.n-tag.te{background:rgba(82,183,136,.2);color:var(--green-light)}
+.n-tag.fi{background:rgba(155,34,38,.25);color:#fca5a5}
+ 
+/* Main */
+.main{flex:1;overflow-y:auto;background:var(--gray-50)}
+.view{display:none;padding:28px 32px;max-width:860px}
+.view.active{display:block}
+ 
+/* Setup */
+.setup-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}
+.setup-card{background:var(--white);border-radius:16px;padding:40px;max-width:400px;width:100%;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.06);border:1px solid var(--gray-300)}
+.setup-icon{width:64px;height:64px;border-radius:14px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px}
+.setup-card h1{font-size:22px;font-weight:700;color:var(--gray-900);margin-bottom:6px}
+.setup-card p{font-size:14px;color:var(--gray-500);margin-bottom:24px;line-height:1.6}
+.setup-card input{width:100%;padding:11px 14px;border:1.5px solid var(--gray-300);border-radius:var(--radius);font-size:14px;font-family:'Nunito',sans-serif;margin-bottom:10px;color:var(--gray-900);outline:none;transition:border .2s}
+.setup-card input:focus{border-color:var(--green-light)}
+.setup-card select{width:100%;padding:11px 14px;border:1.5px solid var(--gray-300);border-radius:var(--radius);font-size:14px;font-family:'Nunito',sans-serif;margin-bottom:16px;color:var(--gray-900);background:var(--white);outline:none}
+.btn-start{width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;transition:background .2s;font-family:'Nunito',sans-serif}
+.btn-start:hover{background:var(--green-light)}
+ 
+/* Dashboard */
+.dash-banner{background:linear-gradient(135deg,var(--green) 0%,var(--green-light) 100%);border-radius:14px;padding:22px 26px;color:#fff;margin-bottom:22px;display:flex;align-items:center;gap:16px}
+.dash-banner-icon{font-size:40px}
+.dash-banner h2{font-size:18px;font-weight:700}
+.dash-banner p{font-size:13px;opacity:.85;margin-top:3px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat-box{background:var(--white);border-radius:var(--radius);padding:14px 16px;border:1px solid var(--gray-300)}
+.stat-box .lbl{font-size:11px;color:var(--gray-500);margin-bottom:4px}
+.stat-box .val{font-size:24px;font-weight:700;color:var(--gray-900)}
+.stat-box .sub{font-size:11px;color:var(--gray-500);margin-top:2px}
+.section-hd{font-size:15px;font-weight:700;color:var(--gray-900);margin-bottom:12px}
+.mod-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:22px}
+.mod-card{background:var(--white);border:1px solid var(--gray-300);border-radius:14px;padding:16px 18px;cursor:pointer;transition:box-shadow .2s,border-color .2s}
+.mod-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);border-color:var(--green-light)}
+.mod-card-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.mod-num{width:32px;height:32px;border-radius:8px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--green);flex-shrink:0}
+.mod-name{font-size:14px;font-weight:700;color:var(--gray-900)}
+.mod-meta{font-size:11px;color:var(--gray-500)}
+.mod-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.tag{display:inline-flex;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.tag-th{background:var(--blue-bg);color:var(--blue-light)}
+.tag-pr{background:var(--amber-bg);color:var(--amber)}
+.tag-te{background:var(--green-bg);color:var(--green)}
+.tag-fi{background:var(--red-bg);color:var(--red)}
+.mod-bar{height:4px;background:var(--gray-100);border-radius:4px;margin-top:8px}
+.mod-bar-fill{height:4px;border-radius:4px;background:var(--green-light);transition:width .5s}
+ 
+/* Lesson header */
+.lesson-hd{margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--gray-300)}
+.lesson-hd h2{font-size:20px;font-weight:700;color:var(--gray-900)}
+.lesson-hd-meta{display:flex;align-items:center;gap:8px;margin-top:8px}
+.lh-tag{padding:3px 10px;border-radius:10px;font-size:12px;font-weight:600}
+.lh-th{background:var(--blue-bg);color:var(--blue-light)}
+.lh-pr{background:var(--amber-bg);color:var(--amber)}
+.lh-te{background:var(--green-bg);color:var(--green)}
+.lh-fi{background:var(--red-bg);color:var(--red)}
+.lh-mod{font-size:12px;color:var(--gray-500)}
+ 
+/* Theory */
+.theory-body{font-size:14px;line-height:1.75;color:var(--gray-700)}
+.theory-body h3{font-size:15px;font-weight:700;color:var(--gray-900);margin:20px 0 8px}
+.theory-body p{margin-bottom:12px}
+.code-block{background:var(--gray-900);border-radius:var(--radius);padding:16px 18px;font-size:12.5px;line-height:1.7;margin:12px 0;white-space:pre-wrap;color:#e5e7eb;overflow-x:auto}
+.kw{color:#7dd3fc}.fn{color:#86efac}.st{color:#fcd34d}.cm{color:#6b7280}.num{color:#f9a8d4}
+.tip-box{background:var(--blue-bg);border-left:3px solid var(--blue-light);border-radius:0 var(--radius) var(--radius) 0;padding:12px 16px;font-size:13px;color:var(--blue);margin:12px 0}
+ 
+/* Practice */
+.practice-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.task-desc{background:var(--white);border:1px solid var(--gray-300);border-radius:var(--radius);padding:16px}
+.task-desc h3{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--gray-900)}
+.task-desc p{font-size:13px;color:var(--gray-600);line-height:1.6}
+.task-expect{background:var(--green-bg);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--green);margin-top:8px;font-family:'JetBrains Mono',monospace}
+.editor{width:100%;height:150px;background:var(--gray-900);color:#e5e7eb;border:1px solid var(--gray-300);border-radius:var(--radius);padding:14px;font-size:12.5px;line-height:1.6;resize:vertical;outline:none}
+.editor:focus{border-color:var(--green-light)}
+.run-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .2s;font-family:'Nunito',sans-serif}
+.run-btn:hover{background:var(--green-light)}
+.out-box{background:var(--gray-900);border-radius:var(--radius);padding:12px;font-size:12px;color:#9ca3af;min-height:52px;margin-top:8px;font-family:'JetBrains Mono',monospace;white-space:pre-wrap}
+.out-ok{background:var(--green-bg);color:var(--green)}
+.out-err{background:var(--red-bg);color:var(--red)}
+.hint-box{background:var(--amber-bg);border-left:3px solid var(--amber-light);border-radius:0 8px 8px 0;padding:10px 14px;font-size:12px;color:var(--amber);margin-top:8px;display:none}
+ 
+/* Test & Final */
+.test-hd{background:var(--white);border:1px solid var(--gray-300);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.test-hd-title{font-size:15px;font-weight:700;color:var(--gray-900)}
+.test-hd-sub{font-size:12px;color:var(--gray-500)}
+.q-card{background:var(--white);border:1px solid var(--gray-300);border-radius:var(--radius);padding:18px;margin-bottom:10px}
+.q-text{font-size:14px;font-weight:600;color:var(--gray-900);margin-bottom:12px}
+.q-code{background:var(--gray-900);border-radius:8px;padding:10px 14px;font-size:12px;color:#e5e7eb;margin-bottom:12px;font-family:'JetBrains Mono',monospace;white-space:pre}
+.option{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--gray-300);border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:13px;color:var(--gray-700);transition:all .15s}
+.option:hover{border-color:var(--green-light);background:var(--green-bg)}
+.option.sel{border-color:var(--green-light);background:var(--green-bg);color:var(--green);font-weight:600}
+.option.corr{border-color:var(--green);background:var(--green-bg);color:var(--green);font-weight:600}
+.option.wrong{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+.opt-circle{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--gray-300);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s}
+.option.sel .opt-circle,.option.corr .opt-circle{border-color:var(--green);background:var(--green);color:#fff}
+.option.wrong .opt-circle{border-color:var(--red);background:var(--red);color:#fff}
+.result-card{background:var(--white);border:1px solid var(--gray-300);border-radius:14px;padding:30px;text-align:center;margin-bottom:20px}
+.result-pct{font-size:52px;font-weight:700;color:var(--gray-900)}
+.result-grade{display:inline-block;padding:5px 20px;border-radius:20px;font-size:16px;font-weight:700;margin-top:10px}
+.g5{background:var(--green-bg);color:var(--green)}
+.g4{background:var(--blue-bg);color:var(--blue-light)}
+.g3{background:var(--amber-bg);color:var(--amber)}
+.g2{background:var(--red-bg);color:var(--red)}
+ 
+/* Bottom nav */
+.lesson-nav{display:flex;justify-content:space-between;align-items:center;margin-top:26px;padding-top:18px;border-top:1px solid var(--gray-300)}
+.btn{padding:9px 18px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--gray-300);background:var(--white);color:var(--gray-700);transition:all .15s;font-family:'Nunito',sans-serif}
+.btn:hover{border-color:var(--gray-500);background:var(--gray-100)}
+.btn-green{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-green:hover{background:var(--green-light);border-color:var(--green-light)}
+.btn-red{background:var(--red);color:#fff;border-color:var(--red)}
+.btn-red:hover{opacity:.85}
+ 
+/* Report */
+.report-print-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:var(--white);border:1.5px solid var(--gray-300);border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;font-family:'Nunito',sans-serif}
+.report-print-btn:hover{background:var(--gray-100)}
+.report-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+.report-table th{text-align:left;padding:9px 12px;background:var(--gray-100);font-weight:700;font-size:11px;color:var(--gray-500);border-bottom:1px solid var(--gray-300);text-transform:uppercase;letter-spacing:.04em}
+.report-table td{padding:9px 12px;border-bottom:1px solid var(--gray-100);color:var(--gray-700)}
+.report-table tr:last-child td{border-bottom:none}
+.grade-chip{display:inline-flex;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.chart-wrap{display:flex;align-items:flex-end;gap:10px;height:100px;margin-top:10px;padding-bottom:4px}
+.bar-col{display:flex;flex-direction:column;align-items:center;flex:1;gap:4px}
+.bar-fill{width:100%;border-radius:4px 4px 0 0;background:var(--green-light);min-height:4px;transition:height .5s}
+.bar-lbl{font-size:10px;color:var(--gray-500);text-align:center}
+.bar-val{font-size:11px;font-weight:700;color:var(--gray-700)}
+ 
+@media print{
+  .sidebar,.lesson-nav,.run-btn,.btn,.report-print-btn{display:none!important}
+  .main{overflow:visible}
+  .view.active{padding:16px}
+}
+</style>
+</head>
+<body>
+ 
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🐍</div>
+    <div><div class="logo-text">Python курсы</div><div class="logo-sub">11-сынып · 3 модуль</div></div>
+  </div>
+  <div class="sidebar-student">Оқушы: <span id="s-name">—</span> · <span id="s-class">—</span></div>
+  <div class="global-prog">
+    <div class="g-bar-bg"><div class="g-bar-fill" id="g-bar" style="width:0%"></div></div>
+    <div class="g-label" id="g-label">0 / 18 аяқталды</div>
+  </div>
+ 
+  <div class="nav-group">
+    <div class="nav-group-title">Жалпы</div>
+    <div class="nav-item active" onclick="showView('dashboard')"><div class="n-dot" style="background:var(--green-light)"></div>Басты бет</div>
+    <div class="nav-item" onclick="showView('report')"><div class="n-dot"></div>📊 Отчет</div>
+  </div>
+ 
+  <div class="nav-group">
+    <div class="nav-group-title">Модуль 1 — Негіздер</div>
+    <div class="nav-item done" id="n0" onclick="go(0)"><div class="n-dot"></div>1. Python-ға кіріспе<span class="n-tag th">Теория</span></div>
+    <div class="nav-item" id="n1" onclick="go(1)"><div class="n-dot"></div>2. Айнымалылар<span class="n-tag th">Теория</span></div>
+    <div class="nav-item" id="n2" onclick="go(2)"><div class="n-dot"></div>3. Деректер типтері<span class="n-tag pr">Практика</span></div>
+    <div class="nav-item" id="n3" onclick="go(3)"><div class="n-dot"></div>Тест №1 (10 сұрақ)<span class="n-tag te">Тест</span></div>
+    <div class="nav-item" id="n4" onclick="go(4)"><div class="n-dot"></div>Қорытынды тест М1<span class="n-tag fi">Қиын</span></div>
+  </div>
+ 
+  <div class="nav-group">
+    <div class="nav-group-title">Модуль 2 — Шарттар/Циклдар</div>
+    <div class="nav-item" id="n5" onclick="go(5)"><div class="n-dot"></div>4. if/else шарттар<span class="n-tag th">Теория</span></div>
+    <div class="nav-item" id="n6" onclick="go(6)"><div class="n-dot"></div>5. for/while циклдар<span class="n-tag th">Теория</span></div>
+    <div class="nav-item" id="n7" onclick="go(7)"><div class="n-dot"></div>6. Практика — Циклдар<span class="n-tag pr">Практика</span></div>
+    <div class="nav-item" id="n8" onclick="go(8)"><div class="n-dot"></div>Тест №2 (10 сұрақ)<span class="n-tag te">Тест</span></div>
+    <div class="nav-item" id="n9" onclick="go(9)"><div class="n-dot"></div>Қорытынды тест М2<span class="n-tag fi">Қиын</span></div>
+  </div>
+ 
+  <div class="nav-group">
+    <div class="nav-group-title">Модуль 3 — Функциялар/Тізімдер</div>
+    <div class="nav-item" id="n10" onclick="go(10)"><div class="n-dot"></div>7. Функциялар<span class="n-tag th">Теория</span></div>
+    <div class="nav-item" id="n11" onclick="go(11)"><div class="n-dot"></div>8. Тізімдер (list)<span class="n-tag th">Теория</span></div>
+    <div class="nav-item" id="n12" onclick="go(12)"><div class="n-dot"></div>9. Практикалық жоба<span class="n-tag pr">Практика</span></div>
+    <div class="nav-item" id="n13" onclick="go(13)"><div class="n-dot"></div>Тест №3 (10 сұрақ)<span class="n-tag te">Тест</span></div>
+    <div class="nav-item" id="n14" onclick="go(14)"><div class="n-dot"></div>Қорытынды тест М3<span class="n-tag fi">Қиын</span></div>
+  </div>
+</div>
+ 
+<!-- MAIN -->
+<div class="main" id="main-area">
+ 
+<!-- SETUP -->
+<div class="setup-wrap" id="view-setup">
+  <div class="setup-card">
+    <div class="setup-icon">🐍</div>
+    <h1>Python 11-сынып</h1>
+    <p>Бағдарламалау курсына қош келдіңіз! Атыңыз бен сыныпыңызды енгізіп, бастаңыз.</p>
+    <input type="text" id="inp-name" placeholder="Аты-жөніңіз (мысалы: Алмас Жаксыбеков)" maxlength="60" />
+    <select id="inp-class">
+      <option value="">— Сыныпты таңдаңыз —</option>
+      <option>11 «А»</option><option>11 «Ә»</option><option>11 «Б»</option>
+      <option>11 «В»</option><option>11 «Г»</option><option>11 «Д»</option>
+    </select>
+    <button class="btn-start" onclick="startCourse()">Бастау →</button>
+  </div>
+</div>
+ 
+<!-- DASHBOARD -->
+<div class="view" id="view-dashboard">
+  <div class="dash-banner">
+    <div class="dash-banner-icon">🐍</div>
+    <div>
+      <h2 id="dash-name">Қош келдіңіз!</h2>
+      <p>Python 11-сынып · 3 модуль · 9 сабақ + 6 тест (3 стандарт + 3 қорытынды)</p>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="lbl">Аяқталған</div><div class="val" id="d-done">0</div><div class="sub">/ 15 сабақ+тест</div></div>
+    <div class="stat-box"><div class="lbl">Орташа балл</div><div class="val" id="d-avg">—</div><div class="sub">тесттерден</div></div>
+    <div class="stat-box"><div class="lbl">Соңғы баға</div><div class="val" id="d-grade">—</div><div class="sub"></div></div>
+    <div class="stat-box"><div class="lbl">Прогресс</div><div class="val" id="d-pct">0%</div><div class="sub">курстан</div></div>
+  </div>
+  <div class="section-hd">Модульдер</div>
+  <div class="mod-grid">
+    <div class="mod-card" onclick="go(0)">
+      <div class="mod-card-top"><div class="mod-num">1</div><div><div class="mod-name">Негіздер</div><div class="mod-meta">3 сабақ + 2 тест</div></div></div>
+      <div class="mod-tags"><span class="tag tag-th">Теория</span><span class="tag tag-pr">Практика</span><span class="tag tag-te">Тест</span><span class="tag tag-fi">Қорытынды</span></div>
+      <div class="mod-bar"><div class="mod-bar-fill" id="mp1" style="width:0%"></div></div>
+    </div>
+    <div class="mod-card" onclick="go(5)">
+      <div class="mod-card-top"><div class="mod-num">2</div><div><div class="mod-name">Шарттар мен циклдар</div><div class="mod-meta">3 сабақ + 2 тест</div></div></div>
+      <div class="mod-tags"><span class="tag tag-th">Теория</span><span class="tag tag-pr">Практика</span><span class="tag tag-te">Тест</span><span class="tag tag-fi">Қорытынды</span></div>
+      <div class="mod-bar"><div class="mod-bar-fill" id="mp2" style="width:0%"></div></div>
+    </div>
+    <div class="mod-card" onclick="go(10)">
+      <div class="mod-card-top"><div class="mod-num">3</div><div><div class="mod-name">Функциялар мен тізімдер</div><div class="mod-meta">3 сабақ + 2 тест</div></div></div>
+      <div class="mod-tags"><span class="tag tag-th">Теория</span><span class="tag tag-pr">Практика</span><span class="tag tag-te">Тест</span><span class="tag tag-fi">Қорытынды</span></div>
+      <div class="mod-bar"><div class="mod-bar-fill" id="mp3" style="width:0%"></div></div>
+    </div>
+    <div class="mod-card" onclick="showView('report')">
+      <div class="mod-card-top"><div class="mod-num" style="background:#f3f4f6">📄</div><div><div class="mod-name">Отчет</div><div class="mod-meta">Прогресс, нәтижелер, баспа</div></div></div>
+      <div style="font-size:12px;color:var(--gray-500);margin-top:4px">Барлық тесттер мен нәтижелер</div>
+    </div>
+  </div>
+</div>
+ 
+<!-- THEORY -->
+<div class="view" id="view-theory"></div>
+<!-- PRACTICE -->
+<div class="view" id="view-practice"></div>
+<!-- TEST -->
+<div class="view" id="view-test"></div>
+<!-- REPORT -->
+<div class="view" id="view-report">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+    <div>
+      <h2 style="font-size:20px;font-weight:700;color:var(--gray-900)">Оқушы отчеті</h2>
+      <p id="r-student" style="font-size:13px;color:var(--gray-500);margin-top:4px"></p>
+    </div>
+    <button class="report-print-btn" onclick="window.print()">🖨 Басып шығару</button>
+  </div>
+  <div class="stats-row">
+    <div class="stat-box"><div class="lbl">Аяқталған</div><div class="val" id="r-done">0/15</div></div>
+    <div class="stat-box"><div class="lbl">Орташа балл</div><div class="val" id="r-avg">—</div></div>
+    <div class="stat-box"><div class="lbl">Орташа баға</div><div class="val" id="r-avggrade">—</div></div>
+    <div class="stat-box"><div class="lbl">Прогресс</div><div class="val" id="r-pct">0%</div></div>
+  </div>
+  <div class="section-hd">Тест нәтижелері</div>
+  <table class="report-table">
+    <thead><tr><th>#</th><th>Тест</th><th>Түрі</th><th>Балл</th><th>Дұрыс</th><th>Баға</th><th>Күні</th></tr></thead>
+    <tbody id="r-tests"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--gray-500)">Тесттер өтілмеген</td></tr></tbody>
+  </table>
+  <div class="section-hd">Сабақтар журналы</div>
+  <table class="report-table">
+    <thead><tr><th>#</th><th>Сабақ</th><th>Түрі</th><th>Күйі</th></tr></thead>
+    <tbody id="r-lessons"></tbody>
+  </table>
+  <div class="section-hd">Тест балдары (диаграмма)</div>
+  <div class="chart-wrap" id="r-chart"></div>
+</div>
+ 
+</div><!-- /main -->
+ 
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const LESSONS = [
+// 0 — Theory
+{type:'theory',title:'1-сабақ: Python-ға кіріспе',mod:1,content:{
+  intro:'Python — 1991 жылы Гвидо ван Россум жасаған, жоғары деңгейлі, оңай оқылатын программалау тілі. Ол бүгінде дүниежүзінде ең танымал тілдердің бірі.',
+  sections:[
+    {h:'Python не үшін қолданылады?',p:'Веб-қосымшалар (Instagram, YouTube), деректер талдауы, жасанды интеллект, ғылыми есептеулер, автоматтандыру — Python барлығында бар.'},
+    {h:'Алғашқы бағдарлама',code:`# Алғашқы Python бағдарламасы\nprint("Сәлем, Әлем!")\nprint("Python оқуды бастадым!")\n\n# Нәтиже:\n# Сәлем, Әлем!\n# Python оқуды бастадым!`,p:'print() — экранға мәтін шығаратын негізгі функция. # — комментарий белгісі, бұл жолдар орындалмайды.'},
+    {h:'Python синтаксисінің ерекшелігі',p:'Python кодты блоктарға бөлу үшін жақша немесе BEGIN/END қолданбайды — тек шегініс (4 бос орын) қолданады. Бұл кодты оқуды жеңілдетеді.'},
+    {h:'input() — пайдаланушыдан деректер алу',code:`аты = input("Атыңызды енгізіңіз: ")\nprint("Сәлем,", аты)\n\n# Нәтиже:\n# Атыңызды енгізіңіз: Алмас\n# Сәлем, Алмас`,p:'input() функциясы пайдаланушыдан мәтін алады. Ол әрқашан str (жол) типінде қайтарады.'},
+  ]
+}},
+// 1 — Theory
+{type:'theory',title:'2-сабақ: Айнымалылар мен деректер',mod:1,content:{
+  intro:'Айнымалы (переменная) — жадыдағы аталған ұяшық. Python-да айнымалыны жариялаудың арнайы сөзі жоқ — тек меншіктеу = жеткілікті.',
+  sections:[
+    {h:'Айнымалы жасау',code:`# Айнымалылар\nат = "Алмас"\nжас = 17\nбой = 1.75\nоқушы = True\n\nprint(ат)    # Алмас\nprint(жас)   # 17\nprint(бой)   # 1.75`,p:'Айнымалы атауы: кіші әріптен басталуы керек, бос орын болмауы керек, сан бастамауы керек.'},
+    {h:'Деректер типтері',code:`# 4 негізгі тип\nжол = "Сәлем"          # str\nбүтін = 42             # int  \nбөлшек = 3.14         # float\nлогикалық = True      # bool\n\nprint(type(жол))      # <class 'str'>\nprint(type(бүтін))    # <class 'int'>`,p:'Python деректің типін автоматты анықтайды — бұл dynamic typing деп аталады.'},
+    {h:'Тип түрлендіру',code:`# Типтер арасында ауысу\nсан_жол = "42"\nсан_бүтін = int(сан_жол)   # "42" → 42\nсан_бөлшек = float("3.14") # "3.14" → 3.14\nжол_сан = str(100)         # 100 → "100"\n\nprint(сан_бүтін + 8)   # 50`,p:'input() әрқашан str береді. Санмен жұмыс жасас үшін int() немесе float() арқылы түрлендіру керек.'},
+    {h:'Математикалық операторлар',code:`a, b = 17, 5\nprint(a + b)   # 22 — қосу\nprint(a - b)   # 12 — алу\nprint(a * b)   # 85 — көбейту\nprint(a / b)   # 3.4 — бөлу\nprint(a // b)  # 3 — бүтін бөлу\nprint(a % b)   # 2 — қалдық\nprint(a ** 2)  # 289 — дәреже`,p:'// — бүтін бөлу (дробь болмайды), % — қалдық, ** — дәреже.'},
+  ]
+}},
+// 2 — Practice
+{type:'practice',title:'3-сабақ: Практика — Деректер типтері',mod:1,tasks:[
+  {id:'p1',title:'Өзіңіз туралы',desc:'Аты, жасы, бойы (float) және оқушы (bool) айнымалыларын жасаңыз. Барлығын print() арқылы шығарыңыз.',start:'# Айнымалыларды толтырыңыз\nат = ""\nжас = 0\nбой = 0.0\nоқушы_ма = True\n\nprint(ат, жас, бой, оқушы_ма)',check:c=>c.includes('print')&&c.includes('=')&&c.includes('.')},
+  {id:'p2',title:'Есептеулер',desc:'a=23, b=7 берілген. Қосынды, айырма, көбейтінді, бөлінді, қалдық және дәрежесін (a**2) есептеп шығарыңыз.',start:'a = 23\nb = 7\n\n# Есептеңіз\nқосынды = 0\nайырма = 0\nкөбейтінді = 0\nбөлінді = 0\nқалдық = 0\nдәреже = 0\n\nprint(қосынды, айырма, көбейтінді, бөлінді, қалдық, дәреже)',check:c=>c.includes('+')&&c.includes('-')&&c.includes('*')&&c.includes('/')&&c.includes('%')&&c.includes('**')},
+]},
+// 3 — Test 10 questions
+{type:'test',title:'Тест №1: Негіздер (10 сұрақ)',mod:1,isFinal:false,qs:[
+  {q:'Python-да экранға мәтін шығаратын функция?',opts:['write()','print()','show()','display()'],a:1},
+  {q:'x = 10 нені орындайды?',opts:['x мәнін оқиды','x-ке 10 меншіктейді','10 шығарады','Қате'],a:1},
+  {q:'print(2 + 3 * 4) нәтижесі?',opts:['20','14','10','Қате'],a:1},
+  {q:'"Сәлем" мәнінің типі?',opts:['int','float','str','bool'],a:2},
+  {q:'# белгісі нені білдіреді?',opts:['Функция','Комментарий','Айнымалы','Цикл'],a:1},
+  {q:'type(3.14) нені береді?',opts:["<class 'int'>",'<class \'float\'>','<class \'str\'>','<class \'bool\'>'],a:1},
+  {q:'int("25") нәтижесі?',opts:['"25"','25','25.0','Қате'],a:1},
+  {q:'17 % 5 нәтижесі?',opts:['3','2','4','1'],a:1},
+  {q:'Python-да бош орын саны маңызды ма?',opts:['Жоқ, ешқашан','Иә, блоктарды айқындайды','Тек функцияларда','Жоқ, жай стиль'],a:1},
+  {q:'2 ** 8 нәтижесі?',opts:['16','256','64','128'],a:1},
+]},
+// 4 — Final test M1
+{type:'test',title:'Қорытынды тест: Модуль 1 (Күрделі)',mod:1,isFinal:true,qs:[
+  {q:'Төмендегі код нені шығарады?\nx = 5\ny = x * 2 + 1\nprint(y)',opts:['10','11','12','Қате'],a:1,code:'x = 5\ny = x * 2 + 1\nprint(y)'},
+  {q:'print(10 // 3) нәтижесі?',opts:['3.33','3','4','3.0'],a:1},
+  {q:'a = "5" + "3" нәтижесі?',opts:['8','53','"53"','Қате'],a:1},
+  {q:'Қай жол ДҰРЫС айнымалы атауы?',opts:['1-сан','менің саным','_score','class'],a:2},
+  {q:'x = int(input()) болса, пайдаланушы "17.5" енгізсе не болады?',opts:['17.5 сақталады','17 сақталады','Қате шығады','None сақталады'],a:2},
+  {q:'print(type(True)) нәтижесі?',opts:["<class 'str'>",'<class \'bool\'>','<class \'int\'>','True'],a:1},
+  {q:'a, b = 10, 3 болса, a % b + a // b = ?',opts:['4','5','6','7'],a:1},
+  {q:'str(42) + str(8) нәтижесі?',opts:['50','428','"50"','"428"'],a:1},
+  {q:'print(bool(0)) нәтижесі?',opts:['True','False','0','None'],a:1},
+  {q:'Қай функция пайдаланушыдан мәтін алады?',opts:['read()','get()','input()','scan()'],a:2},
+  {q:'x = 100\nx = x + 1\nprint(x) нәтижесі?',opts:['100','101','x+1','Қате'],a:1,code:'x = 100\nx = x + 1\nprint(x)'},
+  {q:'17 ** 2 нәтижесі?',opts:['34','289','170','271'],a:1},
+]},
+// 5 — Theory
+{type:'theory',title:'4-сабақ: if/else шарттар',mod:2,content:{
+  intro:'Шарттық оператор if — бағдарламаның белгілі бір жағдайда ғана орындалатын бөлігін анықтайды. Ол бағдарламаға "ақыл-ой" береді.',
+  sections:[
+    {h:'Негізгі if-else',code:`жас = 17\n\nif жас >= 18:\n    print("Кәмелетке толған")\nelse:\n    print("Кәмелетке толмаған")\n\n# Нәтиже: Кәмелетке толмаған`,p:'Шарт True болса — if блогы, False болса — else блогы орындалады. Шегіністі ұмытпаңыз!'},
+    {h:'elif — бірнеше шарт',code:`балл = 85\n\nif балл >= 90:\n    print("Баға: 5 (Өте жақсы)")\nelif балл >= 75:\n    print("Баға: 4 (Жақсы)")\nelif балл >= 60:\n    print("Баға: 3 (Қанағат)")\nelse:\n    print("Баға: 2 (Қанағатсыз)")\n\n# Нәтиже: Баға: 4 (Жақсы)`,p:'elif — else if дегенді білдіреді. Python жоғарыдан бастап, бірінші True шартта тоқтайды.'},
+    {h:'Салыстыру операторлары',code:`# ==  тең\n# !=  тең емес  \n# >   үлкен\n# <   кіші\n# >=  үлкен немесе тең\n# <=  кіші немесе тең\n\nprint(5 == 5)   # True\nprint(3 != 4)   # True\nprint(7 > 10)   # False`,p:'Назар аударыңыз: теңдік үшін == қолданылады (бір = меншіктеу үшін!).'},
+    {h:'and, or, not',code:`жас = 20\nбілеті = True\n\nif жас >= 18 and білеті:\n    print("Кіруге рұқсат")\nelse:\n    print("Кіруге рұқсат жоқ")\n\n# Нәтиже: Кіруге рұқсат`,p:'and — екеуі де True болуы керек. or — кемінде біреуі True болуы керек. not — шартты теріске шығарады.'},
+  ]
+}},
+// 6 — Theory
+{type:'theory',title:'5-сабақ: for/while циклдар',mod:2,content:{
+  intro:'Цикл — белгілі бір кодты бірнеше рет орындауға мүмкіндік береді. Python-да екі негізгі цикл бар: for және while.',
+  sections:[
+    {h:'for + range()',code:`# 1-ден 5-ке дейін\nfor i in range(1, 6):\n    print(i, end=" ")\n# Нәтиже: 1 2 3 4 5\n\n# range(бастауы, соңы, қадамы)\nfor i in range(0, 10, 2):\n    print(i, end=" ")\n# Нәтиже: 0 2 4 6 8`,p:'range(n) — 0-ден n-1-ге дейін. range(a,b) — a-дан b-1-ге дейін. range(a,b,k) — k-адаммен.'},
+    {h:'for — тізім бойынша',code:`жемістер = ["алма", "банан", "апельсин"]\n\nfor жеміс in жемістер:\n    print(жеміс)\n\n# Жол таңбалары бойынша\nfor әріп in "Python":\n    print(әріп, end="-")\n# Нәтиже: P-y-t-h-o-n-`,p:'for циклі кез келген итерациялық объект бойынша жүре алады.'},
+    {h:'while циклі',code:`санауыш = 1\n\nwhile санауыш <= 5:\n    print(санауыш)\n    санауыш += 1   # санауыш = санауыш + 1\n\n# Нәтиже: 1 2 3 4 5`,p:'while — шарт True болғанша орындалады. Санауышты өзгертпесеңіз, шексіз цикл болады!'},
+    {h:'break және continue',code:`for i in range(1, 11):\n    if i == 6:\n        break      # циклдан шығу\n    if i % 2 == 0:\n        continue   # келесі итерацияға өту\n    print(i, end=" ")\n# Нәтиже: 1 3 5`,p:'break — циклды толық тоқтатады. continue — ағымдағы итерацияны өткізіп, келесіге өтеді.'},
+  ]
+}},
+// 7 — Practice
+{type:'practice',title:'6-сабақ: Практика — Циклдар',mod:2,tasks:[
+  {id:'p3',title:'Таблица',desc:'7-нің көбейту кестесін (1-ден 10-ға дейін) for циклімен шығарыңыз. Формат: "7 x 1 = 7"',start:'for i in range(1, 11):\n    # f-string қолданыңыз\n    pass',check:c=>c.includes('range')&&c.includes('for')&&c.includes('7')&&(c.includes('*')||c.includes('print'))},
+  {id:'p4',title:'Жұп сандар',desc:'1-ден 30-ға дейінгі жұп сандарды шығарыңыз (% операторын қолданыңыз).',start:'for i in range(1, 31):\n    # % 2 == 0 шартын қолданыңыз\n    pass',check:c=>c.includes('%')&&c.includes('2')&&c.includes('if')},
+]},
+// 8 — Test 10q
+{type:'test',title:'Тест №2: Шарттар/Циклдар (10 сұрақ)',mod:2,isFinal:false,qs:[
+  {q:'Python-да шарттық оператор қалай жазылады?',opts:['if(шарт){}','if шарт:','if[шарт]','IF шарт'],a:1},
+  {q:'range(3, 8) нені береді?',opts:['3,4,5,6,7,8','3,4,5,6,7','2,3,4,5,6,7','3,4,5,6,7,8,9'],a:1},
+  {q:'Шегіністің мақсаты?',opts:['Эстетика үшін','Блоктарды айқындайды','Жылдамдатады','Міндетті емес'],a:1},
+  {q:'while циклі қашан тоқтайды?',opts:['break жазғанда ғана','Шарт False болғанда','n рет орындалғанда','Ешқашан тоқтамайды'],a:1},
+  {q:'break операторы не істейді?',opts:['Циклды кідіртеді','Циклдан толық шығады','Келесіге өтеді','Қате шығарады'],a:1},
+  {q:'5 != 5 нәтижесі?',opts:['True','False','None','Қате'],a:1},
+  {q:'for i in range(5): неше рет орындалады?',opts:['4','5','6','0'],a:1},
+  {q:'elif нені білдіреді?',opts:['else if','end if','else loop','extra if'],a:0},
+  {q:'and операторы қашан True береді?',opts:['Кемінде бірі True','Екеуі де True','Екеуі де False','Ешқашан'],a:1},
+  {q:'continue операторы не істейді?',opts:['Циклды тоқтатады','Ағымдағы итерацияны өткізеді','Мәнді шығарады','Функцияны шақырады'],a:1},
+]},
+// 9 — Final M2
+{type:'test',title:'Қорытынды тест: Модуль 2 (Күрделі)',mod:2,isFinal:true,qs:[
+  {q:'Төмендегі код нені шығарады?\nfor i in range(2,10,3):\n    print(i,end=" ")',opts:['2 5 8','2 4 6 8','2 3 4 5','2 5 8 11'],a:0,code:'for i in range(2,10,3):\n    print(i,end=" ")'},
+  {q:'Нәтиже не болады?\nx=10\nwhile x>0:\n    x-=3\nprint(x)',opts:['0','-1','-2','-3'],a:2,code:'x=10\nwhile x>0:\n    x-=3\nprint(x)'},
+  {q:'count = 0\nfor i in range(10):\n    if i%2==0: count+=1\nprint(count)',opts:['4','5','6','3'],a:1,code:'count=0\nfor i in range(10):\n    if i%2==0: count+=1\nprint(count)'},
+  {q:'Шексіз цикл жасайтын код?',opts:['for i in range(100):','while True: pass','for i in []: pass','while 0: pass'],a:1},
+  {q:'not (True and False) нәтижесі?',opts:['True','False','None','Қате'],a:0},
+  {q:'range(5,-1,-1) бірінші мәні?',opts:['5','4','-1','0'],a:0},
+  {q:'for i in "abc": print(i) неше жол шығарады?',opts:['1','2','3','4'],a:2},
+  {q:'Баға берушi код: балл=72 болса нәтиже?',opts:['5','4','3','2'],a:2,code:'балл=72\nif балл>=90: print(5)\nelif балл>=75: print(4)\nelif балл>=60: print(3)\nelse: print(2)'},
+  {q:'break пен continue айырмасы?',opts:['Бірдей','break тоқтатады, continue өткізеді','continue тоқтатады, break өткізеді','Бірде-бірі жұмыс жасамайды'],a:1},
+  {q:'i=1\nwhile i<100:\n    i*=2\nprint(i) нәтижесі?',opts:['64','128','100','256'],a:1,code:'i=1\nwhile i<100:\n    i*=2\nprint(i)'},
+  {q:'or операторы қашан False береді?',opts:['Екеуі де True','Екеуі де False','Бірі True','Бірі False'],a:1},
+  {q:'for бен while айырмасы?',opts:['Бірдей','for-белгілі рет, while-шарт бойынша','while жылдамырақ','for тек тізімге'],a:1},
+]},
+// 10 — Theory
+{type:'theory',title:'7-сабақ: Функциялар',mod:3,content:{
+  intro:'Функция — атауы бар, бір рет анықтап, бірнеше рет шақыруға болатын код блогы. Функциялар кодты ұйымдастырады және қайталануды азайтады.',
+  sections:[
+    {h:'Функция жасау мен шақыру',code:`def сәлемде(аты):\n    print(f"Сәлем, {аты}!")\n\n# Шақыру\nсәлемде("Айгерім")  # Сәлем, Айгерім!\nсәлемде("Бекзат")   # Сәлем, Бекзат!`,p:'def кілт сөзі функция анықтайды. f"..." — f-string: фигуралы жақша ішіне айнымалы жазылады.'},
+    {h:'Параметрлер мен return',code:`def қосу(а, б):\n    нәтиже = а + б\n    return нәтиже\n\ndef аудан(ені, биіктігі=10):  # default мән\n    return ені * биіктігі\n\nprint(қосу(5, 3))     # 8\nprint(аудан(6))       # 60 (биіктік=10)`,p:'return — функциядан мән қайтарады. Параметрлерге default (әдепкі) мән беруге болады.'},
+    {h:'Локальды және глобальды айнымалылар',code:`санауыш = 0   # глобальды\n\ndef арттыру():\n    global санауыш\n    санауыш += 1\n\nарттыру()\nарттыру()\nprint(санауыш)  # 2`,p:'Функция ішіндегі айнымалы — локальды. Глобальды айнымалыны өзгерту үшін global кілт сөзі керек.'},
+    {h:'Рекурсия',code:`def факториал(n):\n    if n <= 1:\n        return 1\n    return n * факториал(n - 1)\n\nprint(факториал(5))  # 120\n# 5! = 5*4*3*2*1 = 120`,p:'Рекурсия — функцияның өзін-өзі шақыруы. Міндетті түрде тоқтату шарты болуы керек!'},
+  ]
+}},
+// 11 — Theory
+{type:'theory',title:'8-сабақ: Тізімдер (list)',mod:3,content:{
+  intro:'Тізім (list) — бірнеше мәнді реттілікпен сақтайтын деректер құрылымы. Python-дағы ең жиі қолданылатын деректер типтерінің бірі.',
+  sections:[
+    {h:'Тізім жасау және индекс',code:`# Тізім жасау\nбалдар = [85, 92, 78, 96, 88]\n\nprint(балдар[0])    # 85 (бірінші)\nprint(балдар[-1])   # 88 (соңғы)\nprint(балдар[1:3])  # [92, 78] (тілім)\nprint(len(балдар))  # 5`,p:'Индекс 0-ден басталады. Теріс индекс соңынан санайды. [a:b] — a-дан b-1-ге дейінгі тілім.'},
+    {h:'Тізім әдістері',code:`тізім = [3, 1, 4, 1, 5, 9]\n\nтізім.append(2)      # соңына қосу → [...,2]\nтізім.insert(0, 7)   # басына қосу → [7,...]\nтізім.remove(1)      # бірінші 1-ді өшіру\nтізім.sort()         # өсу ретімен сұрыптау\nтізім.reverse()      # кері айналдыру\nпоп = тізім.pop()    # соңғыны алу және өшіру\nprint(len(тізім))    # ұзындық`,p:'append() — жиі. insert(i,x) — нақты позицияға. pop() — соңғыны алып өшіреді.'},
+    {h:'Тізімдермен жұмыс',code:`сандар = [5, 2, 8, 1, 9, 3]\n\nprint(sum(сандар))    # 28 — қосынды\nprint(max(сандар))    # 9 — максимум\nprint(min(сандар))    # 1 — минимум\nprint(sorted(сандар)) # [1,2,3,5,8,9]\nprint(9 in сандар)    # True — бар ма?`,p:'sum(), max(), min() — Python-ның кірістірілген функциялары. in — элемент бар-жоғын тексереді.'},
+    {h:'Тізімді аралау (comprehension)',code:`# Ескі жол:\nквадраттар = []\nfor i in range(1, 6):\n    квадраттар.append(i**2)\n\n# List comprehension:\nквадраттар = [i**2 for i in range(1, 6)]\nprint(квадраттар)  # [1, 4, 9, 16, 25]`,p:'List comprehension — тізімді бір жолда жасаудың элегантты жолы. Кейінірек жиі кездеседі.'},
+  ]
+}},
+// 12 — Practice
+{type:'practice',title:'9-сабақ: Практикалық жоба',mod:3,tasks:[
+  {id:'p5',title:'Квадрат қосындысы',desc:'Екі санды қабылдап, олардың квадраттарының қосындысын қайтаратын функция жазыңыз. Мысалы: квадрат_қос(3,4) → 25',start:'def квадрат_қос(а, б):\n    # а² + б² есептеңіз\n    pass\n\nprint(квадрат_қос(3, 4))  # 25 болуы керек\nprint(квадрат_қос(5, 12)) # 169 болуы керек',check:c=>c.includes('return')&&c.includes('**')&&c.includes('def')},
+  {id:'p6',title:'Максимум (max-сіз)',desc:'Берілген сандар тізімінен ең үлкен санды табатын функция жазыңыз. max() функциясын пайдаланбаңыз!',start:'def максимум(тізім):\n    # for цикл арқылы табыңыз\n    pass\n\nсандар = [3, 17, 5, 42, 8, 11]\nprint(максимум(сандар))  # 42 болуы керек',check:c=>c.includes('for')&&c.includes('return')&&c.includes('def')&&!c.includes('max(')},
+]},
+// 13 — Test 10q
+{type:'test',title:'Тест №3: Функциялар/Тізімдер (10 сұрақ)',mod:3,isFinal:false,qs:[
+  {q:'Функция жариялау кілт сөзі?',opts:['function','func','def','fun'],a:2},
+  {q:'тізім=[10,20,30] болса, тізім[1] = ?',opts:['10','20','30','Қате'],a:1},
+  {q:'return нені орындайды?',opts:['Функцияны тоқтатып мән қайтарады','Экранға шығарады','Цикл аяқтайды','Жаңа функция жасайды'],a:0},
+  {q:'тізім.append(5) нені орындайды?',opts:['5-ші элементті табады','Соңына 5 қосады','Ұзындық 5 болса шын','Барлық 5-ті өшіреді'],a:1},
+  {q:'len([1,2,3,4,5]) = ?',opts:['4','5','6','[1,2,3,4,5]'],a:1},
+  {q:'тізім[-1] нені береді?',opts:['Соңғы элемент','Бірінші элемент','Қате','None'],a:0},
+  {q:'sum([1,2,3,4]) = ?',opts:['4','10','24','Қате'],a:1},
+  {q:'Рекурсия дегеніміз?',opts:['Цикл типі','Функцияның өзін шақыруы','Тізім әдісі','Импорт'],a:1},
+  {q:'sorted([3,1,2]) нәтижесі?',opts:['[3,1,2]','[1,2,3]','[3,2,1]','None'],a:1},
+  {q:'def f(x=5): return x*2 — f() шақырса?',opts:['Қате','0','5','10'],a:3},
+]},
+// 14 — Final M3
+{type:'test',title:'Қорытынды тест: Модуль 3 (Күрделі)',mod:3,isFinal:true,qs:[
+  {q:'def f(a,b=2,c=3): return a+b+c\nf(1,c=10) нәтижесі?',opts:['6','13','14','Қате'],a:1,code:'def f(a,b=2,c=3): return a+b+c\nprint(f(1,c=10))'},
+  {q:'[x**2 for x in range(4)] нәтижесі?',opts:['[1,4,9,16]','[0,1,4,9]','[0,1,2,3]','[1,2,3,4]'],a:1},
+  {q:'def f(n): return 1 if n<=1 else n*f(n-1)\nf(4) = ?',opts:['4','12','24','6'],a:2,code:'def f(n):\n    return 1 if n<=1 else n*f(n-1)\nprint(f(4))'},
+  {q:'а=[1,2,3]\nb=а\nb.append(4)\nprint(а) нәтижесі?',opts:['[1,2,3]','[1,2,3,4]','Қате','[4]'],a:1,code:'а=[1,2,3]\nb=а\nb.append(4)\nprint(а)'},
+  {q:'[i for i in range(10) if i%3==0] = ?',opts:['[0,3,6,9]','[3,6,9]','[1,3,6,9]','[0,3,6]'],a:0},
+  {q:'sorted vs .sort() айырмасы?',opts:['Бірдей','sorted жаңа тізім, sort орнын өзгертеді','sort жылдамырақ','sorted тек жолға'],a:1},
+  {q:'тізім=[5,3,8,1]\nтізім.sort()\nprint(тізім[0]) нәтижесі?',opts:['5','1','3','8'],a:1,code:'тізім=[5,3,8,1]\nтізім.sort()\nprint(тізім[0])'},
+  {q:'def f(): x=10\nf()\nprint(x) не болады?',opts:['10','None','Қате (x анықталмаған)','0'],a:2,code:'def f(): x=10\nf()\nprint(x)'},
+  {q:'[1,2,3]+[4,5] нәтижесі?',opts:['[1,2,3,4,5]','15','Қате','[5,7]'],a:0},
+  {q:'max([3,1,4,1,5,9,2,6]) = ?',opts:['9','6','5','3'],a:0},
+  {q:'Функцияның параметрсіз return нені қайтарады?',opts:['0','""','None','False'],a:2},
+  {q:'[1,2,3]*2 нәтижесі?',opts:['[1,2,3,1,2,3]','[2,4,6]','[1,4,9]','Қате'],a:0},
+]},
+];
+ 
+// ============================================================
+// STATE
+// ============================================================
+let S = {
+  name:'', cls:'', done:new Array(15).fill(false),
+  scores:{}, submitted:{}, answers:{}, practiceOk:{}, curLesson:-1
+};
+ 
+// ============================================================
+// START
+// ============================================================
+function startCourse(){
+  const n=document.getElementById('inp-name').value.trim();
+  const c=document.getElementById('inp-class').value;
+  if(!n||!c){alert('Аты мен сыныпты толтырыңыз');return;}
+  S.name=n; S.cls=c;
+  document.getElementById('s-name').textContent=n;
+  document.getElementById('s-class').textContent=c;
+  document.getElementById('dash-name').textContent='Қош келдіңіз, '+n+'!';
+  document.getElementById('view-setup').style.display='none';
+  showV('dashboard');
+  updateStats();
+}
+ 
+// ============================================================
+// VIEWS
+// ============================================================
+function showV(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el=document.getElementById('view-'+name);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  if(name==='dashboard') document.querySelectorAll('.nav-item')[0].classList.add('active');
+  if(name==='report'){document.querySelectorAll('.nav-item')[1].classList.add('active');buildReport();}
+}
+ 
+function go(idx){
+  S.curLesson=idx;
+  const L=LESSONS[idx];
+  document.querySelectorAll('.nav-item').forEach((el,i)=>{
+    el.classList.remove('active');
+    if(i===idx+2) el.classList.add('active');
+  });
+  if(L.type==='theory') renderTheory(idx);
+  else if(L.type==='practice') renderPractice(idx);
+  else renderTest(idx);
+}
+ 
+// ============================================================
+// THEORY
+// ============================================================
+function renderTheory(idx){
+  const L=LESSONS[idx];
+  let h=`<div class="lesson-hd"><h2>${L.title}</h2><div class="lesson-hd-meta"><span class="lh-tag lh-th">Теория</span><span class="lh-mod">Модуль ${L.mod}</span></div></div>`;
+  h+=`<div class="theory-body"><p>${L.content.intro}</p>`;
+  L.content.sections.forEach(s=>{
+    h+=`<h3>${s.h}</h3>`;
+    if(s.code) h+=`<div class="code-block">${hCode(s.code)}</div>`;
+    if(s.p) h+=`<p>${s.p}</p>`;
+  });
+  h+=`</div>`;
+  h+=navBtns(idx,true);
+  document.getElementById('view-theory').innerHTML=h;
+  showV('theory');
+}
+ 
+function hCode(c){
+  return c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/(#[^\n]*)/g,'<span class="cm">$1</span>')
+    .replace(/\b(def|return|if|elif|else|for|in|while|True|False|None|and|or|not|global|break|continue|pass)\b/g,'<span class="kw">$1</span>')
+    .replace(/\b(print|input|range|len|type|int|float|str|bool|sum|max|min|sorted|append|insert|remove|sort|reverse|pop)\b/g,'<span class="fn">$1</span>')
+    .replace(/("([^"]*)")/g,'<span class="st">$1</span>')
+    .replace(/\b(\d+\.?\d*)\b/g,'<span class="num">$1</span>');
+}
+ 
+// ============================================================
+// PRACTICE
+// ============================================================
+function renderPractice(idx){
+  const L=LESSONS[idx];
+  let h=`<div class="lesson-hd"><h2>${L.title}</h2><div class="lesson-hd-meta"><span class="lh-tag lh-pr">Практика</span><span class="lh-mod">Модуль ${L.mod}</span></div></div>`;
+  L.tasks.forEach((t,i)=>{
+    const ok=S.practiceOk[t.id];
+    h+=`<div class="practice-split">
+      <div class="task-desc"><h3>Тапсырма ${i+1}: ${t.title}</h3><p>${t.desc}</p></div>
+      <div>
+        <textarea class="editor" id="ed-${t.id}">${t.start}</textarea>
+        <button class="run-btn" onclick="checkPr('${t.id}',${idx})">▶ Тексеру</button>
+        <div class="hint-box" id="hint-${t.id}">💡 Тапсырманы мұқият оқыңыз. Қажетті операторлар жоқ.</div>
+        <div class="out-box ${ok?'out-ok':''}" id="out-${t.id}">${ok?'✓ Дұрыс орындалды! Жарайсың.':'Кодты жазып, ▶ Тексеру басыңыз...'}</div>
+      </div></div>`;
+  });
+  h+=navBtns(idx,L.tasks.every(t=>S.practiceOk[t.id]));
+  document.getElementById('view-practice').innerHTML=h;
+  showV('practice');
+}
+ 
+function checkPr(tid,idx){
+  const L=LESSONS[idx];
+  const t=L.tasks.find(x=>x.id===tid);
+  const c=document.getElementById('ed-'+tid).value;
+  const ok=t.check(c);
+  S.practiceOk[tid]=ok;
+  document.getElementById('out-'+tid).className='out-box '+(ok?'out-ok':'out-err');
+  document.getElementById('out-'+tid).textContent=ok?'✓ Дұрыс орындалды! Жарайсың.':'✗ Тапсырма орындалмады. Тағы тырысыңыз.';
+  document.getElementById('hint-'+tid).style.display=ok?'none':'block';
+  const allOk=L.tasks.every(t=>S.practiceOk[t.id]);
+  const nb=document.querySelector('#view-practice .btn-green');
+  if(nb) nb.style.opacity=allOk?'1':'.45';
+}
+ 
+// ============================================================
+// TEST
+// ============================================================
+function renderTest(idx){
+  const L=LESSONS[idx];
+  const sub=S.submitted[idx];
+  const isFinal=L.isFinal;
+  let h=`<div class="lesson-hd"><h2>${L.title}</h2><div class="lesson-hd-meta"><span class="lh-tag ${isFinal?'lh-fi':'lh-te'}">${isFinal?'Қорытынды тест':'Тест'}</span><span class="lh-mod">Модуль ${L.mod} · ${L.qs.length} сұрақ</span></div></div>`;
+  if(sub){
+    h+=renderResult(idx,L);
+  } else {
+    h+=`<div class="test-hd"><div><div class="test-hd-title">${L.qs.length} сұраққа жауап беріңіз</div><div class="test-hd-sub">Барлық сұрақ міндетті</div></div></div>`;
+    L.qs.forEach((q,qi)=>{
+      const sel=S.answers[idx]&&S.answers[idx][qi];
+      h+=`<div class="q-card"><div class="q-text">${qi+1}. ${q.q.split('\n')[0]}</div>`;
+      if(q.code) h+=`<div class="q-code">${q.code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+      q.opts.forEach((o,oi)=>{
+        const isSel=sel===oi;
+        h+=`<div class="option${isSel?' sel':''}" onclick="selAns(${idx},${qi},${oi},this)"><div class="opt-circle">${isSel?'✓':''}</div>${o}</div>`;
+      });
+      h+=`</div>`;
+    });
+    h+=`<div style="text-align:right;margin-top:8px"><button class="btn btn-red" onclick="submitTest(${idx})">Тапсыру →</button></div>`;
+  }
+  document.getElementById('view-test').innerHTML=h;
+  showV('test');
+}
+ 
+function selAns(idx,qi,oi,el){
+  if(S.submitted[idx]) return;
+  if(!S.answers[idx]) S.answers[idx]={};
+  S.answers[idx][qi]=oi;
+  el.closest('.q-card').querySelectorAll('.option').forEach(o=>{o.classList.remove('sel');o.querySelector('.opt-circle').textContent='';});
+  el.classList.add('sel');el.querySelector('.opt-circle').textContent='✓';
+}
+ 
+function submitTest(idx){
+  const L=LESSONS[idx];
+  const ans=S.answers[idx]||{};
+  const missing=L.qs.length-Object.keys(ans).length;
+  if(missing>0){alert(missing+' сұраққа жауап берілмеді!');return;}
+  let corr=0;
+  L.qs.forEach((q,qi)=>{if(ans[qi]===q.a) corr++;});
+  const pct=Math.round(corr/L.qs.length*100);
+  S.scores[idx]=pct; S.submitted[idx]=true; S.done[idx]=true;
+  updateNavDots(); updateStats(); renderTest(idx);
+}
+ 
+function renderResult(idx,L){
+  const pct=S.scores[idx];
+  const corr=L.qs.filter((_,qi)=>S.answers[idx][qi]===L.qs[qi].a).length;
+  const g=pct>=90?5:pct>=75?4:pct>=60?3:2;
+  const gc=g===5?'g5':g===4?'g4':g===3?'g3':'g2';
+  const msg=g===5?'Керемет! Тамаша нәтиже.':g===4?'Жақсы жұмыс! Жалғастырыңыз.':g===3?'Қанағаттанарлық. Тақырыпты қайталаңыз.':'Тақырыпты қайталап, қайта тапсырыңыз.';
+  let h=`<div class="result-card">
+    <div style="font-size:14px;color:var(--gray-500)">${L.title}</div>
+    <div class="result-pct">${pct}%</div>
+    <div style="font-size:14px;color:var(--gray-600)">${corr} / ${L.qs.length} дұрыс жауап</div>
+    <div><span class="result-grade ${gc}">${g} баға</span></div>
+    <div style="font-size:13px;color:var(--gray-500);margin-top:10px">${msg}</div>
+  </div>`;
+  h+=`<div class="section-hd" style="margin-bottom:12px">Жауаптарды тексеру</div>`;
+  L.qs.forEach((q,qi)=>{
+    const ua=S.answers[idx][qi];
+    const right=ua===q.a;
+    h+=`<div class="q-card"><div class="q-text">${qi+1}. ${q.q.split('\n')[0]} ${right?'✅':'❌'}</div>`;
+    if(q.code) h+=`<div class="q-code">${q.code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+    q.opts.forEach((o,oi)=>{
+      let cls='';
+      if(oi===q.a) cls='corr';
+      else if(oi===ua&&!right) cls='wrong';
+      h+=`<div class="option ${cls}"><div class="opt-circle">${oi===q.a?'✓':oi===ua&&!right?'✗':''}</div>${o}</div>`;
+    });
+    h+=`</div>`;
+  });
+  h+=navBtns(idx,true);
+  return h;
+}
+ 
+// ============================================================
+// NAV BUTTONS
+// ============================================================
+function navBtns(idx,canComplete){
+  let h=`<div class="lesson-nav">`;
+  if(idx>0) h+=`<button class="btn" onclick="go(${idx-1})">← Алдыңғы</button>`;
+  else h+=`<button class="btn" onclick="showV('dashboard')">⌂ Басты</button>`;
+  if(!S.done[idx]&&LESSONS[idx].type!=='test'){
+    h+=`<button class="btn btn-green" onclick="completeLes(${idx})" style="opacity:${canComplete?'1':'.45'}">${canComplete?'Аяқталды ✓':'Аяқтау үшін тапсырмаларды орындаңыз'}</button>`;
+  } else if(S.done[idx]&&LESSONS[idx].type!=='test'){
+    h+=`<span style="font-size:13px;color:var(--green);font-weight:600">✓ Аяқталды</span>`;
+  } else h+=`<span></span>`;
+  if(idx<LESSONS.length-1) h+=`<button class="btn" onclick="go(${idx+1})">Келесі →</button>`;
+  else h+=`<button class="btn" onclick="showV('report')">📊 Отчет →</button>`;
+  h+=`</div>`;
+  return h;
+}
+ 
+function completeLes(idx){
+  S.done[idx]=true;
+  updateNavDots(); updateStats();
+  if(idx<LESSONS.length-1) go(idx+1);
+  else showV('dashboard');
+}
+ 
+// ============================================================
+// STATS
+// ============================================================
+function updateNavDots(){
+  LESSONS.forEach((_,i)=>{
+    const el=document.getElementById('n'+i);
+    if(!el) return;
+    const dot=el.querySelector('.n-dot');
+    if(S.done[i]){dot.style.background='var(--green-light)';el.classList.add('done');}
+  });
+}
+ 
+function updateStats(){
+  const dc=S.done.filter(Boolean).length;
+  const testIdxs=[3,4,8,9,13,14];
+  const scores=testIdxs.filter(i=>S.scores[i]!==undefined).map(i=>S.scores[i]);
+  const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):null;
+  const lastScore=scores.length?scores[scores.length-1]:null;
+  const lastG=lastScore!==null?(lastScore>=90?5:lastScore>=75?4:lastScore>=60?3:2):null;
+  const pct=Math.round(dc/15*100);
+  document.getElementById('g-bar').style.width=pct+'%';
+  document.getElementById('g-label').textContent=dc+' / 15 аяқталды';
+  document.getElementById('d-done').textContent=dc;
+  document.getElementById('d-avg').textContent=avg!==null?avg+'%':'—';
+  document.getElementById('d-grade').textContent=lastG||'—';
+  document.getElementById('d-pct').textContent=pct+'%';
+  const m1i=[0,1,2,3,4],m2i=[5,6,7,8,9],m3i=[10,11,12,13,14];
+  document.getElementById('mp1').style.width=(m1i.filter(i=>S.done[i]).length/5*100)+'%';
+  document.getElementById('mp2').style.width=(m2i.filter(i=>S.done[i]).length/5*100)+'%';
+  document.getElementById('mp3').style.width=(m3i.filter(i=>S.done[i]).length/5*100)+'%';
+}
+ 
+// ============================================================
+// REPORT
+// ============================================================
+function buildReport(){
+  const now=new Date().toLocaleDateString('kk-KZ');
+  document.getElementById('r-student').textContent=`${S.name} · ${S.cls} · ${now}`;
+  const dc=S.done.filter(Boolean).length;
+  const testIdxs=[3,4,8,9,13,14];
+  const testNames=['Тест №1 (10с)','Қорытынды М1','Тест №2 (10с)','Қорытынды М2','Тест №3 (10с)','Қорытынды М3'];
+  const scores=testIdxs.filter(i=>S.scores[i]!==undefined).map(i=>S.scores[i]);
+  const avg=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):null;
+  const avgG=avg!==null?(avg>=90?5:avg>=75?4:avg>=60?3:2):null;
+  const pct=Math.round(dc/15*100);
+  document.getElementById('r-done').textContent=dc+'/15';
+  document.getElementById('r-avg').textContent=avg!==null?avg+'%':'—';
+  document.getElementById('r-avggrade').textContent=avgG||'—';
+  document.getElementById('r-pct').textContent=pct+'%';
+ 
+  let tHTML='';
+  if(scores.length===0){
+    tHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--gray-500)">Тесттер өтілмеген</td></tr>';
+  } else {
+    testIdxs.forEach((ti,n)=>{
+      if(S.scores[ti]===undefined) return;
+      const sc=S.scores[ti];
+      const L=LESSONS[ti];
+      const corr=Math.round(sc*L.qs.length/100);
+      const g=sc>=90?5:sc>=75?4:sc>=60?3:2;
+      const gc=g===5?'g5':g===4?'g4':g===3?'g3':'g2';
+      const isFinal=L.isFinal;
+      tHTML+=`<tr>
+        <td>${n+1}</td>
+        <td>${testNames[n]}</td>
+        <td><span class="tag ${isFinal?'tag-fi':'tag-te'}">${isFinal?'Қорытынды':'Стандарт'}</span></td>
+        <td>${sc}%</td>
+        <td>${corr}/${L.qs.length}</td>
+        <td><span class="grade-chip ${gc}">${g}</span></td>
+        <td>${now}</td>
+      </tr>`;
+    });
+  }
+  document.getElementById('r-tests').innerHTML=tHTML;
+ 
+  let lHTML='';
+  LESSONS.forEach((L,i)=>{
+    const done=S.done[i];
+    const type=L.type==='theory'?'Теория':L.type==='practice'?'Практика':(L.isFinal?'Қорытынды тест':'Тест');
+    const tClass=L.type==='theory'?'tag-th':L.type==='practice'?'tag-pr':(L.isFinal?'tag-fi':'tag-te');
+    lHTML+=`<tr><td>${i+1}</td><td>${L.title}</td><td><span class="tag ${tClass}">${type}</span></td><td>${done?'<span class="tag tag-te">✓ Аяқталды</span>':'<span style="color:var(--gray-400);font-size:12px">Аяқталмаған</span>'}</td></tr>`;
+  });
+  document.getElementById('r-lessons').innerHTML=lHTML;
+ 
+  let cHTML='';
+  testIdxs.forEach((ti,n)=>{
+    const sc=S.scores[ti];
+    const h=sc!==undefined?Math.max(4,sc*0.9):4;
+    const col=sc===undefined?'var(--gray-300)':sc>=75?'var(--green-light)':'var(--amber-light)';
+    cHTML+=`<div class="bar-col">
+      <div class="bar-val">${sc!==undefined?sc+'%':'—'}</div>
+      <div class="bar-fill" style="height:${h}px;background:${col}"></div>
+      <div class="bar-lbl">${testNames[n]}</div>
+    </div>`;
+  });
+  document.getElementById('r-chart').innerHTML=cHTML;
+}
+</script>
+</body>
+</html>
+ 
